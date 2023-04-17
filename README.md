@@ -1,6 +1,9 @@
 # assembly-vote-blockchain
 
-Pour compiler le code source du projet, il faut vous placer à la racine du projet et compiler le projet comme suit :
+The code is a smart contract of a simple model of political voting for resolutionsput in place by an assembly and candidates with crypto wallet.
+
+To compile the project source code, you must go to the project root and compile the project as follows:
+
 ```
 solc -o outputDirectory --bin --ast-compact-json --asm src/Election.sol    
 ```
