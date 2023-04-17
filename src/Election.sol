@@ -13,7 +13,7 @@ contract Election is Ownable {
     
     constructor() Ownable(name) {}
     
-    // Model a Candidate
+    // Model a Resolution
     struct resolution {
         uint256 id;
         string name;
@@ -25,8 +25,7 @@ contract Election is Ownable {
 
     // Store accounts that have voted
     mapping(address => bool) public voters;
-    // Store Candidates
-    // Fetch Candidate
+    // Store & Fetch Resolution
     mapping(uint => resolution) public resolutions;
 
     // voted event
@@ -41,7 +40,7 @@ contract Election is Ownable {
         // require that they haven't voted before
         require(!voters[msg.sender]);
 
-        // require a valid candidate
+        // require a valid resolution
         require(_resolutionId > 0 && _resolutionId <= resolutionsCount);
         
         // add type of vote
@@ -52,7 +51,7 @@ contract Election is Ownable {
         // record that voter has voted
         voters[msg.sender] = true;
 
-        // update candidate vote Count
+        // update resolution vote Count
         resolutions[_resolutionId].voteCount ++;
 
         // trigger voted event
