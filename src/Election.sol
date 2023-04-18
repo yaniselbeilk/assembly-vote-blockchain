@@ -64,6 +64,7 @@ contract Election is Whitelist {
         if (keccak256(abi.encodePacked(v)) == keccak256(abi.encodePacked("F"))) resolutions[_resolutionId].voteFor ++;
         else if (keccak256(abi.encodePacked(v)) == keccak256(abi.encodePacked("A"))) resolutions[_resolutionId].voteAgainst ++;
         else if (keccak256(abi.encodePacked(v)) == keccak256(abi.encodePacked("N"))) resolutions[_resolutionId].voteNeutral++;
+        else revert();
 
         // record that voter has voted
         resolutions[_resolutionId].voters[msg.sender] = true;
