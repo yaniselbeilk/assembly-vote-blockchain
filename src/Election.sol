@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Ownable.sol";
+import "./Whitelist.sol";
 import "./SafeMath.sol";
 
-contract Election is Ownable {
+contract Election is Whitelist {
     
     using SafeMath for uint256;
     // Store Candidates Count
     uint public resolutionsCount;
-
-    
-    constructor() Ownable(name) {}
     
     // Model a Resolution
     struct resolution {
@@ -21,10 +18,12 @@ contract Election is Ownable {
         uint voteFor;
         uint voteAgainst;
         uint voteNeutral;
+        // Store accounts that have voted
+        mapping (address => bool) voters;
     }
 
     // Store accounts that have voted
-    mapping(address => bool) public voters;
+    //mapping(address => bool) public voters;
     // Store & Fetch Resolution
     mapping(uint => resolution) public resolutions;
 
@@ -33,12 +32,30 @@ contract Election is Ownable {
 
     function addResolution (string memory _name) public onlyOwner {
         resolutionsCount ++;
-        resolutions[resolutionsCount] = resolution(resolutionsCount, _name, 0, 0, 0, 0);
+        resolution storage newResolution = resolutions[resolutionsCount];
+        newResolution.id = resolutionsCount;
+        newResolution.name = _name;
+        newResolution.voteAgainst = 0;
+        newResolution.voteCount = 0;
+        newResolution.voteNeutral = 0;
     }
 
+    function createResolution(uint256 _id, string memory _name) internal returns (resolution storage) {
+        resolution storage res = resolutions[_id];
+        res.id = _id;
+        res.name = _name;
+        res.voteCount = 0;
+        res.voteFor = 0;
+        res.voteAgainst = 0;
+        res.voteNeutral = 0;
+        return res;
+    }
+    
+
     function vote (uint _resolutionId, string memory v) public {
-        // require that they haven't voted before
-        require(!voters[msg.sender]);
+
+        // require that they haven't voted before for this resolution
+        require(!resolutions[_resolutionId].voters[msg.sender]);
 
         // require a valid resolution
         require(_resolutionId > 0 && _resolutionId <= resolutionsCount);
@@ -49,7 +66,7 @@ contract Election is Ownable {
         else if (keccak256(abi.encodePacked(v)) == keccak256(abi.encodePacked("N"))) resolutions[_resolutionId].voteNeutral++;
 
         // record that voter has voted
-        voters[msg.sender] = true;
+        resolutions[_resolutionId].voters[msg.sender] = true;
 
         // update resolution vote Count
         resolutions[_resolutionId].voteCount ++;
